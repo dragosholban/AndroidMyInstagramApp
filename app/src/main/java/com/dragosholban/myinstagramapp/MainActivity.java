@@ -10,8 +10,13 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 public class MainActivity extends AppCompatActivity {
+
+    DatabaseReference database;
 
     private static final int RC_SIGN_IN = 123;
 
@@ -20,9 +25,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        database = FirebaseDatabase.getInstance().getReference();
+
         FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
         if(fbUser != null) {
             // User already signed in
+
+            // get the FCM token
+            String token = FirebaseInstanceId.getInstance().getToken();
+
+            // save the user info in the database to users/UID/
+            // we'll use the UID as part of the path
+            User user = new User(fbUser.getUid(), fbUser.getDisplayName(), token);
+            database.child("users").child(user.uid).setValue(user);
+
             // go to feed activity
             Intent intent = new Intent(this, FeedActivity.class);
             startActivity(intent);
@@ -45,6 +61,18 @@ public class MainActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
+
+                // get the Firebase user
+                FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
+
+                // get the FCM token
+                String token = FirebaseInstanceId.getInstance().getToken();
+
+                // save the user info in the database to users/UID/
+                // we'll use the UID as part of the path
+                User user = new User(fbUser.getUid(), fbUser.getDisplayName(), token);
+                database.child("users").child(user.uid).setValue(user);
+
                 // go to feed activity
                 Intent intent = new Intent(this, FeedActivity.class);
                 startActivity(intent);

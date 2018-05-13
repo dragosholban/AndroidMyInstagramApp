@@ -53,6 +53,19 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             holder.mTextView.setText(image.user.displayName);
         }
         Picasso.get().load(image.downloadUrl).into(holder.mImageView);
+
+        holder.mLikeButton.setText("Like (" + image.likes + ")");
+        if(image.hasLiked) {
+            holder.mLikeButton.setBackgroundColor(mActivity.getResources().getColor(R.color.colorAccent));
+        } else {
+            holder.mLikeButton.setBackgroundColor(mActivity.getResources().getColor(R.color.colorPrimary));
+        }
+        holder.mLikeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mActivity.setLiked(image);
+            }
+        });
     }
 
     // Return the size of your dataset (invoked by the layout manager)

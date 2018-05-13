@@ -9,6 +9,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,19 +18,29 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class FeedActivity extends AppCompatActivity {
 
     FirebaseUser fbUser;
     DatabaseReference database;
+    RecyclerView recyclerView;
+    RecyclerView.LayoutManager mLayoutManager;
+    ImageAdapter mAdapter;
+    ArrayList<Image> images = new ArrayList<>();
 
     static final int RC_PERMISSION_READ_EXTERNAL_STORAGE = 1;
     static final int RC_IMAGE_GALLERY = 2;
@@ -44,6 +56,61 @@ public class FeedActivity extends AppCompatActivity {
         }
 
         database = FirebaseDatabase.getInstance().getReference();
+
+        // Setup the RecyclerView
+        recyclerView = findViewById(R.id.recyclerView);
+        mLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new ImageAdapter(images, this);
+        recyclerView.setAdapter(mAdapter);
+
+        // Get the latest 100 images
+        Query imagesQuery = database.child("images").orderByKey().limitToFirst(100);
+        imagesQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                // A new image has been added, add it to the displayed list
+                final Image image = dataSnapshot.getValue(Image.class);
+
+                // get the image user
+                database.child("users/" + image.userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        image.user = user;
+                        mAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                mAdapter.addImage(image);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void uploadImage(View view) {

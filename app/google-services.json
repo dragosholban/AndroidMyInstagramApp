@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "377888665863",
+    "firebase_url": "https://my-instagram-app.firebaseio.com",
+    "project_id": "my-instagram-app",
+    "storage_bucket": "my-instagram-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:377888665863:android:bd511124fc523c87",
+        "android_client_info": {
+          "package_name": "com.dragosholban.myinstagramapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "377888665863-qk9ja39gvb9qtoandk9in11c3kh5kt32.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQBLHr2BGFpjIjX_j-_8p9NzKHNSFZ0uU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
